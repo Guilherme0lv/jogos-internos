@@ -21,23 +21,23 @@ public class JogoDTO {
 
     private Integer id;
     private String dataHora;
-    private Integer arbitroId;
+    private String arbitro;
     private String nomeEquipeA;
     private String nomeEquipeB;
     private Integer placarEquipeA;
     private Integer placarEquipeB;
-    private boolean finalizado;
+    private String status;
 
     public static JogoDTO deModel(Jogo jogo) {
         return JogoDTO.builder()
                 .id(jogo.getId())
                 .dataHora(DataUtil.formatarLocalDateTime(jogo.getDataHora()))
-                .arbitroId(jogo.getArbitro().getId())
+                .arbitro(jogo.getArbitro().getNomeCompleto())
                 .nomeEquipeA(jogo.getEquipeA().getNome())
                 .nomeEquipeB(jogo.getEquipeB().getNome())
                 .placarEquipeA(jogo.getPlacarEquipeA())
                 .placarEquipeB(jogo.getPlacarEquipeB())
-                .finalizado(jogo.isFinalizado())
+                .status(jogo.getStatus().paraString())
                 .build();
     }
 

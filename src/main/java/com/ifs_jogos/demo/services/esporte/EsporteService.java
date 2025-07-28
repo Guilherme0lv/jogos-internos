@@ -7,6 +7,7 @@ import com.ifs_jogos.demo.repositories.JogoRepository;
 import com.ifs_jogos.demo.services.equipe.dto.EquipeDTO;
 import com.ifs_jogos.demo.services.esporte.dto.EsporteDTO;
 import com.ifs_jogos.demo.services.esporte.form.EsporteForm;
+import com.ifs_jogos.demo.services.jogo.JogoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ public class EsporteService {
     private final EsporteRepository esporteRepository;
     private final EventoRepository eventoRepository;
     private final JogoRepository jogoRepository;
+    private final JogoService jogoService;
 
     @Transactional
     public EsporteDTO createEsporte(EsporteForm form) {
@@ -56,6 +58,10 @@ public class EsporteService {
         Esporte esporte = esporteRepository.findById(esporteId)
                 .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
 
+        if (!jogoRepository.findByStatusAndGrupo_Esporte(JogoStatusEnum.PENDENTE, esporte).isEmpty()) {
+            throw new RuntimeException("Ainda há jogos.");
+        }
+
         if(esporte.getGrupos().size()>1) {
             Jogo jogoFinal = getJogoFinal(esporte);
 
@@ -65,9 +71,6 @@ public class EsporteService {
                 esporte.setCampeao(jogoFinal.getEquipeB());
             }
         } else {
-            if (jogoRepository.existeJogoDeGrupoNaoFinalizado(esporte)) {
-                throw new RuntimeException("Ainda há jogos.");
-            }
             List<Grupo> grupos = esporte.getGrupos();
             List<Equipe> equipes = grupos.getFirst().getEquipes();
 

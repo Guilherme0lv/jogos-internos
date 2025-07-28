@@ -1,9 +1,6 @@
 package com.ifs_jogos.demo.repositories;
 
-import com.ifs_jogos.demo.models.Esporte;
-import com.ifs_jogos.demo.models.FaseEnum;
-import com.ifs_jogos.demo.models.Grupo;
-import com.ifs_jogos.demo.models.Jogo;
+import com.ifs_jogos.demo.models.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,9 +12,33 @@ import java.util.Optional;
 @Repository
 public interface JogoRepository extends JpaRepository<Jogo, Integer> {
 
-    List<Jogo> findByFinalizadoTrue();
+
+    //procura por STATUS e ESPORTE
+    List<Jogo> findByStatusAndGrupo_Esporte(JogoStatusEnum status, Esporte esporte);
+
+    //procura por FASE e ESPORTE
+    List<Jogo> findByFaseAndEquipeA_Esporte(FaseEnum fase, Esporte esporte);
+
+    //verifica se há jogos por FASE, STATUS e ESPORTE
+    @Query("""
+    SELECT COUNT(j) > 0 FROM Jogo j
+    WHERE j.fase = :fase
+    AND j.status = :status
+    AND (j.equipeA.esporte = :esporte OR j.equipeB.esporte = :esporte)
+    """)
+    boolean existeJogoEliminatorioPendente(@Param("fase") FaseEnum fase,
+                                           @Param("status") JogoStatusEnum status,
+                                           @Param("esporte") Esporte esporte);
 
     List<Jogo> findByGrupo(Grupo grupo);
+
+    //verifica se há jogos de eliminatorias
+    @Query("""
+    SELECT COUNT(j) > 0 FROM Jogo j
+    WHERE j.fase IN ('OITAVASFINAL', 'QUARTASFINAL', 'SEMIFINAL', 'FINAL')
+    AND j.equipeA.esporte = :esporte
+    """)
+    boolean existsEliminatoria(@Param("esporte") Esporte esporte);
 
     @Query(value = """
     SELECT j.* FROM jogo j
@@ -38,16 +59,6 @@ public interface JogoRepository extends JpaRepository<Jogo, Integer> {
     """, nativeQuery = true)
     Jogo buscarUltimoJogoPorEsporte(@Param("esporteId") Integer esporteId);
 
-    List<Jogo> findByFaseAndEquipeA_Esporte(FaseEnum fase, Esporte esporte);
-
-    @Query("""
-    SELECT CASE WHEN COUNT(j) > 0 THEN true ELSE false END
-    FROM Jogo j
-    WHERE j.grupo.esporte = :esporte AND j.grupo IS NOT NULL AND j.finalizado = false
-    """)
-    boolean existeJogoDeGrupoNaoFinalizado(@Param("esporte") Esporte esporte);
-
-    boolean existsByFaseAndFinalizadoFalseAndEquipeA_Esporte(FaseEnum fase, Esporte esporte);
 
 
 }

@@ -9,7 +9,6 @@ import com.ifs_jogos.demo.services.jogo.JogoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,7 +32,11 @@ public class EliminatoriasService {
         Esporte esporte = esporteRepository.findById(esporteId).orElseThrow(() ->
                 new RuntimeException("Esporte não encontrado."));
 
-        if (existeJogoDeGrupoNaoFinalizado(esporte)) {
+        if (jogoRepository.existsEliminatoria(esporte)) {
+            throw new RuntimeException("Esse esporte já tem jogos eliminatorios gerados.");
+        }
+
+        if (existeJogoDeGrupoPendente(esporte)) {
             throw new RuntimeException("Ainda há jogos na fase de grupos que não foram finalizados");
         }
 
@@ -56,8 +59,8 @@ public class EliminatoriasService {
         }
 
         LocalDateTime dataInicial = LocalDateTime.of(esporte.getEvento().getDataInicio(), LocalTime.of(13, 0));
-        Jogo ultimoJogo = jogoRepository.buscarUltimoJogoPorEsporte(esporte.getId());
 
+        Jogo ultimoJogo = jogoRepository.buscarUltimoJogoPorEsporte(esporte.getId());
         if(ultimoJogo!=null) {
             dataInicial = ultimoJogo.getDataHora().plusDays(1).withHour(13).withMinute(0);
         }
@@ -91,7 +94,7 @@ public class EliminatoriasService {
                     .equipeB(equipeB)
                     .fase(fase)
                     .dataHora(dataHora)
-                    .finalizado(isBye)
+                    .status(isBye ? JogoStatusEnum.WO : JogoStatusEnum.PENDENTE)
                     .placarEquipeA(placarA)
                     .placarEquipeB(placarB)
                     .arbitro(listArbitros.get(random.nextInt(listArbitros.size())))
@@ -106,7 +109,7 @@ public class EliminatoriasService {
         Esporte esporte = esporteRepository.findById(form.getIdEsporte()).orElseThrow(() ->
                 new RuntimeException("Esporte não encontrado."));
 
-        if(existeJogoEliminatorioNaoFinalizado(form)) {
+        if(existeJogoEliminatorioPendente(form)) {
             throw new RuntimeException("A fase atual ainda não foi finalizada!");
         }
 
@@ -122,6 +125,10 @@ public class EliminatoriasService {
         }
 
         FaseEnum proximaFase = getFaseEnum(form);
+
+        if(!jogoRepository.findByFaseAndEquipeA_Esporte(proximaFase, esporte).isEmpty()) {
+            throw new RuntimeException("Essa fase já foi gerada");
+        }
 
         gerarConfrontos(vencedores, proximaFase);
     }
@@ -198,16 +205,18 @@ public class EliminatoriasService {
         return resultado;
     }
 
-    private boolean existeJogoDeGrupoNaoFinalizado(Esporte esporte) {
-        return jogoRepository.existeJogoDeGrupoNaoFinalizado(esporte);
+    private boolean existeJogoDeGrupoPendente(Esporte esporte) {
+        List<Jogo> jogos = jogoRepository.findByStatusAndGrupo_Esporte(JogoStatusEnum.PENDENTE, esporte);
+
+        return !jogos.isEmpty();
     }
 
-    private boolean existeJogoEliminatorioNaoFinalizado(FaseForm form) {
+    private boolean existeJogoEliminatorioPendente(FaseForm form) {
         Esporte esporte = esporteRepository.findById(form.getIdEsporte()).orElseThrow(() ->
                 new RuntimeException("Esporte não encontrado."));
 
-        return jogoRepository.existsByFaseAndFinalizadoFalseAndEquipeA_Esporte(form.getFaseAtual(), esporte);
-
+        return jogoRepository
+                .existeJogoEliminatorioPendente(form.getFaseAtual(), JogoStatusEnum.PENDENTE, esporte);
     }
 
     private boolean isEquipeBye(Equipe equipe) {

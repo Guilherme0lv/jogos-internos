@@ -71,6 +71,7 @@ public class JogoService {
                 jogo.setEquipeB(equipes.get(j));
                 jogo.setPlacarEquipeA(0);
                 jogo.setPlacarEquipeB(0);
+                jogo.setStatus(JogoStatusEnum.PENDENTE);
                 jogo.setFase(FaseEnum.GRUPO);
                 jogo.setArbitro(listArbitros.get(new Random().nextInt(listArbitros.size())));
                 jogo.setDataHora(dataHoraJogo);
@@ -91,14 +92,24 @@ public class JogoService {
                 .toList();
     }
 
+    public List<JogoDTO> findByStatus(JogoStatusEnum status, Integer esporteId) {
+        Esporte esporte = esporteRepository.findById(esporteId)
+                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
 
-    public List<JogoDTO> findByFinalizado() {
-        return jogoRepository.findByFinalizadoTrue()
+        return jogoRepository.findByStatusAndGrupo_Esporte(status, esporte)
                 .stream()
                 .map(JogoDTO::deModel)
                 .toList();
     }
 
+    public List<JogoDTO> findByFaseAndEsporte(FaseEnum fase, Integer esporteId) {
+        Esporte esporte = esporteRepository.findById(esporteId)
+                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+
+        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(fase, esporte);
+
+        return jogos.stream().map(JogoDTO::deModel).toList();
+    }
 
     public List<JogoDTO> findByGrupo(Integer grupoId) {
         Grupo grupo = grupoRepository.findById(grupoId)
@@ -108,16 +119,6 @@ public class JogoService {
                 .stream()
                 .map(JogoDTO::deModel)
                 .toList();
-    }
-
-
-    public List<JogoDTO> findByFaseAndEsporte(FaseEnum fase, Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
-
-        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(fase, esporte);
-
-        return jogos.stream().map(JogoDTO::deModel).toList();
     }
 
     @Transactional
@@ -130,7 +131,7 @@ public class JogoService {
         Jogo jogo = jogoRepository.findById(form.getIdJogo())
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
 
-        if (jogo.isFinalizado()) {
+        if (jogo.getStatus() == JogoStatusEnum.FINALIZADO) {
             throw new RuntimeException("Esse jogo já foi finalizado");
         }
 
@@ -139,7 +140,7 @@ public class JogoService {
 
         jogo.setPlacarEquipeA(form.getPlacarA());
         jogo.setPlacarEquipeB(form.getPlacarB());
-        jogo.setFinalizado(true);
+        jogo.setStatus(JogoStatusEnum.FINALIZADO);
 
         if (jogo.getFase() == FaseEnum.GRUPO) {
             if (jogo.getPlacarEquipeA() > jogo.getPlacarEquipeB()) { //vitoria A
@@ -168,10 +169,9 @@ public class JogoService {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
 
-        if (jogo.isFinalizado()) {
+        if (jogo.getStatus() == JogoStatusEnum.FINALIZADO || jogo.getStatus() == JogoStatusEnum.WO) {
             throw new RuntimeException("Esse jogo já foi finalizado");
         }
-
         Equipe equipeA = jogo.getEquipeA();
         Equipe equipeB = jogo.getEquipeB();
         if (idEquipeVencedora.equals(jogo.getEquipeA().getId())) {
@@ -195,7 +195,7 @@ public class JogoService {
             throw new RuntimeException("Equipe não encontrado.");
         }
 
-        jogo.setFinalizado(true);
+        jogo.setStatus(JogoStatusEnum.WO);
 
         equipeRepository.save(equipeA);
         equipeRepository.save(equipeB);
@@ -209,8 +209,8 @@ public class JogoService {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
 
-        if (!jogo.isFinalizado()) {
-            throw new RuntimeException("Esse jogo não foi finalizado");
+        if (jogo.getStatus() != JogoStatusEnum.WO) {
+            throw new RuntimeException("Não foi aplicado WO nesse jogo.");
         }
 
         Equipe equipeA = jogo.getEquipeA();
@@ -231,7 +231,7 @@ public class JogoService {
                 equipeA.setDerrotas(equipeA.getDerrotas() - 1);
             }
         }
-        jogo.setFinalizado(false);
+        jogo.setStatus(JogoStatusEnum.PENDENTE);
         equipeRepository.save(equipeA);
         equipeRepository.save(equipeB);
         jogoRepository.save(jogo);

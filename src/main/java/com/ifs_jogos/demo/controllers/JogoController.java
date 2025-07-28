@@ -1,6 +1,7 @@
 package com.ifs_jogos.demo.controllers;
 
 import com.ifs_jogos.demo.models.FaseEnum;
+import com.ifs_jogos.demo.models.JogoStatusEnum;
 import com.ifs_jogos.demo.services.jogo.dto.JogoDTO;
 import com.ifs_jogos.demo.services.jogo.form.PlacarForm;
 import com.ifs_jogos.demo.services.jogo.JogoService;
@@ -26,9 +27,9 @@ public class JogoController {
         return jogoService.getJogos();
     }
 
-    @GetMapping("/finalizados")
-    public List<JogoDTO> findByFinalizados() {
-        return jogoService.findByFinalizado();
+    @GetMapping("/finalizados/{statusJogo}/{esporteId}")
+    public List<JogoDTO> findByStatus(@PathVariable("statusJogo")JogoStatusEnum status, @PathVariable("esporteId") Integer esporteId) {
+        return jogoService.findByStatus(status, esporteId);
     }
 
     @GetMapping("/grupo/{grupoId}")
@@ -46,7 +47,7 @@ public class JogoController {
         return jogoService.finalizarJogo(form);
     }
 
-    @PatchMapping("/aplicarWO/{id}/equipeVencedora/{idEquipe}")
+    @PatchMapping("/aplicarWO/{id}/equipe/{idEquipe}")
     public JogoDTO aplicarWO(@PathVariable("id") Integer idJogo, @PathVariable("idEquipe") Integer idEquipe) {
         return jogoService.aplicarWO(idJogo, idEquipe);
     }

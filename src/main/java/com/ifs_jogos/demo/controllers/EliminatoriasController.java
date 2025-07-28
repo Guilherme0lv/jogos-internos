@@ -24,7 +24,6 @@ public class EliminatoriasController {
         return eliminatoriasService.getEliminatorias(form);
     }
 
-
     @PostMapping("/gerar/proxima-fase")
     public void gerarProximaFase(@RequestBody FaseForm form) {
         eliminatoriasService.gerarProximaFase(form);

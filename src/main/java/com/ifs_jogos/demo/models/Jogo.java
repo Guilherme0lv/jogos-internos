@@ -1,6 +1,5 @@
 package com.ifs_jogos.demo.models;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,7 +42,8 @@ public class Jogo {
 
     private Integer placarEquipeB;
 
-    private boolean finalizado = false;
+    @Enumerated(EnumType.STRING)
+    private JogoStatusEnum status;
 
     @Enumerated(EnumType.STRING)
     private FaseEnum fase;

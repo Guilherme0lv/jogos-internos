@@ -44,7 +44,7 @@ public class GrupoService {
 
         if (total <= 5) {
             Grupo grupo = new Grupo();
-            grupo.setNome("Grupo 1");
+            grupo.setNome(grupo.getEsporte().getNome() + " Grupo 1");
             grupo.setEsporte(esporte);
             grupo = grupoRepository.save(grupo);
             grupos.add(grupo);
@@ -61,7 +61,7 @@ public class GrupoService {
         // Cria os grupos
         for (int i = 1; i <= numGrupos; i++) {
             Grupo grupo = new Grupo();
-            grupo.setNome("Grupo " + i);
+            grupo.setNome(grupo.getEsporte().getNome() + "Grupo " + i);
             grupo.setEsporte(esporte);
             grupo = grupoRepository.save(grupo);
             grupos.add(grupo);

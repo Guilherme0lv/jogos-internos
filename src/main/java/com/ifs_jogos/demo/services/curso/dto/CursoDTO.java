@@ -15,13 +15,13 @@ public class CursoDTO {
 
     private String nome;
     private CursoEnum tipoCurso;
-    private Integer coordenadorId;
+    private String coordenador;
 
     public static CursoDTO deModel(Curso curso) {
         return CursoDTO.builder()
                 .nome(curso.getNome())
                 .tipoCurso(curso.getTipoCurso())
-                .coordenadorId(curso.getCoordenador().getId())
+                .coordenador(curso.getCoordenador().getNomeCompleto())
                 .build();
     }
 }
