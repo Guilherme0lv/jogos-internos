@@ -45,12 +45,10 @@ public class CampusService {
     }
 
     @Transactional
-    public CampusDTO deleteCampus(Integer id) {
+    public void deleteCampus(Integer id) {
         Campus campus = campusRepository.findById(id).orElseThrow( () ->
                 new RuntimeException("Campus não encontrado."));
 
         campusRepository.delete(campus);
-
-        return CampusDTO.deModel(campus);
     }
 }

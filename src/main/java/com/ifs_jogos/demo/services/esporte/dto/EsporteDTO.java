@@ -27,21 +27,16 @@ public class EsporteDTO {
     private String tipoEvento;
     private Integer minAtletas;
     private Integer maxAtletas;
-    private List<GrupoDTO> grupos;
+    private String campeao;
 
     public static EsporteDTO deModel(Esporte esporte) {
+        String campeao = esporte.getCampeao()!=null ? esporte.getCampeao().getNome() : "Ainda não há.";
         return EsporteDTO.builder()
                 .nome(esporte.getNome())
                 .tipoEvento(esporte.getEvento().getTipoEvento())
                 .minAtletas(esporte.getMinAtletas())
                 .maxAtletas(esporte.getMaxAtletas())
-                .grupos(
-                        Optional.ofNullable(esporte.getGrupos())
-                                .orElse(Collections.emptyList())
-                                .stream()
-                                .map(g -> new GrupoDTO().deModel(g))
-                                .toList()
-                )
+                .campeao(campeao)
                 .build();
     }
 }

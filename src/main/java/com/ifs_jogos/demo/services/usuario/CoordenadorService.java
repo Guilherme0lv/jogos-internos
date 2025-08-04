@@ -1,10 +1,13 @@
 package com.ifs_jogos.demo.services.usuario;
 
+import com.ifs_jogos.demo.models.Curso;
 import com.ifs_jogos.demo.models.Usuario;
 import com.ifs_jogos.demo.models.UsuarioEnum;
+import com.ifs_jogos.demo.repositories.CursoRepository;
 import com.ifs_jogos.demo.repositories.UsuarioRepository;
 import com.ifs_jogos.demo.services.usuario.dto.UsuarioDTO;
 import com.ifs_jogos.demo.services.usuario.form.CoordenadorForm;
+import com.ifs_jogos.demo.util.PasswordUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,14 +19,22 @@ import java.util.Random;
 public class CoordenadorService {
 
     private final UsuarioRepository usuarioRepository;
+    private final CursoRepository cursoRepository;
 
     @Transactional
-    public UsuarioDTO createCoordenador(CoordenadorForm form) {
-        Usuario coordenador = form.paraModel();
-        coordenador.setSenha(gerarSenha());
-        usuarioRepository.save(coordenador);
+    public void createCoordenador(CoordenadorForm form) {
+        if (usuarioRepository.existsByTipoUsuarioAndCurso_Id(UsuarioEnum.COORDENADOR, form.getCursoId())) {
+            throw new RuntimeException("Já existe um coordenador nesse curso");
+        }
+        Curso curso = cursoRepository.findById(form.getCursoId())
+                .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
 
-        return UsuarioDTO.deModel(coordenador);
+        Usuario coordenador = form.paraModel(curso);
+        coordenador.setSenha(gerarSenha());
+
+        String senhaHash = PasswordUtils.encrypt(coordenador.getSenha());
+        coordenador.setSenha(senhaHash);
+        usuarioRepository.save(coordenador);
     }
 
     @Transactional
@@ -38,7 +49,12 @@ public class CoordenadorService {
 
     private static String gerarSenha() {
         int senha = new Random().nextInt(900000) + 100000;
-        return String.valueOf(senha);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("coord");
+        sb.append(senha);
+
+        return sb.toString();
     }
 
     public String enviarSenhaPorEmail(Integer coordenadorId) {
@@ -49,9 +65,11 @@ public class CoordenadorService {
             throw new RuntimeException("Usuario informado não é um coordenador");
         }
 
+        String senhaDescriptograda = PasswordUtils.decrypt(coordenador.getSenha());
+
         StringBuilder mensagem = new StringBuilder();
         mensagem.append("O seu login é: ").append(coordenador.getMatricula());
-        mensagem.append(" e sua senha é: ").append(coordenador.getSenha());
+        mensagem.append(" e sua senha é: ").append(senhaDescriptograda);
 
         return mensagem.toString();
     }

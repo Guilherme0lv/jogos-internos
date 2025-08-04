@@ -1,5 +1,6 @@
 package com.ifs_jogos.demo.services.usuario.form;
 
+import com.ifs_jogos.demo.models.Curso;
 import com.ifs_jogos.demo.models.Usuario;
 import com.ifs_jogos.demo.models.UsuarioEnum;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,9 @@ public class UsuarioForm {
     private String apelido;
     private String telefone;
     private UsuarioEnum tipoUsuario;
+    private Integer cursoId;
 
-    public Usuario paraModel() {
+    public Usuario paraModel(Curso curso) {
         return Usuario.builder()
                 .matricula(matricula)
                 .senha(senha)
@@ -28,6 +30,7 @@ public class UsuarioForm {
                 .apelido(apelido)
                 .telefone(telefone)
                 .tipoUsuario(tipoUsuario)
+                .curso(curso)
                 .build();
     }
 }

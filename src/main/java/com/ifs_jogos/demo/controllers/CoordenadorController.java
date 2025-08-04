@@ -4,6 +4,7 @@ import com.ifs_jogos.demo.services.usuario.CoordenadorService;
 import com.ifs_jogos.demo.services.usuario.dto.UsuarioDTO;
 import com.ifs_jogos.demo.services.usuario.form.CoordenadorForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -15,17 +16,20 @@ public class CoordenadorController {
     private final CoordenadorService coordenadorService;
 
     @PostMapping
-    public UsuarioDTO createCoordenador(@RequestBody CoordenadorForm form) {
-        return coordenadorService.createCoordenador(form);
+    public ResponseEntity<String> createCoordenador(@RequestBody CoordenadorForm form) {
+        coordenadorService.createCoordenador(form);
+        return ResponseEntity.status(201).body("Coordenador cadastrado com sucesso");
     }
 
     @PatchMapping("/definir-tecnico/{usuarioId}")
-    public UsuarioDTO definirTecnico(@PathVariable("usuarioId") Integer usuarioId) {
-        return coordenadorService.definirTecnico(usuarioId);
+    public ResponseEntity<UsuarioDTO> definirTecnico(@PathVariable("usuarioId") Integer usuarioId) {
+        UsuarioDTO dto = coordenadorService.definirTecnico(usuarioId);
+        return ResponseEntity.ok(dto);
     }
 
     @GetMapping("/getLogin/{coordenadorId}")
-    public String enviarLoginPorEmail(@PathVariable("coordenadorId") Integer coordenadorId) {
-        return coordenadorService.enviarSenhaPorEmail(coordenadorId);
+    public ResponseEntity<String> enviarLoginPorEmail(@PathVariable("coordenadorId") Integer coordenadorId) {
+        String mensagem = coordenadorService.enviarSenhaPorEmail(coordenadorId);
+        return ResponseEntity.ok(mensagem);
     }
 }

@@ -16,4 +16,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     List<Usuario> findByNomeCompleto(String nome);
     List<Usuario> findByTipoUsuario(UsuarioEnum tipoUsuario);
 
+    boolean existsByTipoUsuarioAndCurso_Id(UsuarioEnum tipoUsuario, Integer cursoId);
+
 }

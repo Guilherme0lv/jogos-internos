@@ -35,15 +35,4 @@ public class Grupo {
     @Column(nullable = true)
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     private List<Jogo> jogos;
-
-    public void addEquipe(Equipe equipe) {
-        equipe.setGrupo(this);
-        equipes.add(equipe);
-    }
-
-    public void removeEquipe(Equipe equipe) {
-        equipe.setGrupo(null);
-        equipes.remove(equipe);
-    }
-
 }

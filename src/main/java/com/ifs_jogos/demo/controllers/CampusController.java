@@ -5,6 +5,7 @@ import com.ifs_jogos.demo.services.campus.CampusService;
 import com.ifs_jogos.demo.services.campus.dto.CampusDTO;
 import com.ifs_jogos.demo.services.campus.form.CampusForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,22 +19,26 @@ public class CampusController {
     private final CampusService campusService;
 
     @PostMapping
-    public CampusDTO createCampus(@RequestBody CampusForm campus) {
-        return campusService.createCampus(campus);
+    public ResponseEntity<CampusDTO> createCampus(@RequestBody CampusForm campus) {
+        CampusDTO created = campusService.createCampus(campus);
+        return ResponseEntity.status(201).body(created);
     }
 
     @GetMapping
-    public List<CampusDTO> getCampus() {
-        return campusService.getCampus();
+    public ResponseEntity<List<CampusDTO>> getCampus() {
+        List<CampusDTO> list = campusService.getCampus();
+        return ResponseEntity.ok(list);
     }
 
     @PatchMapping("/update/{id}")
-    public CampusDTO updateCampus(@PathVariable("id") Integer id, @RequestBody CampusForm form) {
-        return campusService.updateCampus(id, form);
+    public ResponseEntity<CampusDTO> updateCampus(@PathVariable("id") Integer id, @RequestBody CampusForm form) {
+        CampusDTO updated = campusService.updateCampus(id, form);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/id/{id}")
-    public CampusDTO deleteCampus(@PathVariable("id") Integer id) {
-        return campusService.deleteCampus(id);
+    public ResponseEntity<String> deleteCampus(@PathVariable("id") Integer id) {
+        campusService.deleteCampus(id);
+        return ResponseEntity.ok("Campus deletado com sucesso.");
     }
 }

@@ -5,6 +5,7 @@ import com.ifs_jogos.demo.services.esporte.EsporteService;
 import com.ifs_jogos.demo.services.esporte.dto.EsporteDTO;
 import com.ifs_jogos.demo.services.esporte.form.EsporteForm;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,33 +18,38 @@ public class EsporteController {
     private final EsporteService esporteService;
 
     @PostMapping
-    public EsporteDTO createEsporte(@RequestBody EsporteForm form) {
-        return esporteService.createEsporte(form);
+    public ResponseEntity<EsporteDTO> createEsporte(@RequestBody EsporteForm form) {
+        EsporteDTO dto = esporteService.createEsporte(form);
+        return ResponseEntity.status(201).body(dto);
     }
 
     @GetMapping
-    public List<EsporteDTO> getEsportes() {
-        return esporteService.getEsportes();
+    public ResponseEntity<List<EsporteDTO>> getEsportes() {
+        List<EsporteDTO> esportes = esporteService.getEsportes();
+        return ResponseEntity.ok(esportes);
     }
 
     @GetMapping("/nome/{nome}")
-    public EsporteDTO findByNome(@PathVariable("nome") String nome) {
-        return esporteService.findByNome(nome);
+    public ResponseEntity<EsporteDTO> findByNome(@PathVariable("nome") String nome) {
+        EsporteDTO dto = esporteService.findByNome(nome);
+        return ResponseEntity.ok(dto);
     }
 
     @PatchMapping("/campeao/{esporteId}")
-    public EquipeDTO getCampeao(@PathVariable("esporteId") Integer esporteId) {
-        return esporteService.getCampeao(esporteId);
+    public ResponseEntity<EquipeDTO> getCampeao(@PathVariable("esporteId") Integer esporteId) {
+        EquipeDTO campeao = esporteService.getCampeao(esporteId);
+        return ResponseEntity.ok(campeao);
     }
 
     @PatchMapping("/update/{id}")
-    public EsporteDTO updateEsporte(@PathVariable("id") Integer id, @RequestBody EsporteForm form) {
-        return esporteService.updateEsporte(id, form);
+    public ResponseEntity<EsporteDTO> updateEsporte(@PathVariable("id") Integer id, @RequestBody EsporteForm form) {
+        EsporteDTO dto = esporteService.updateEsporte(id, form);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public EsporteDTO deleteEsporte(@PathVariable("id") Integer id) {
-        return esporteService.deleteEsporte(id);
+    public ResponseEntity<String> deleteEsporte(@PathVariable("id") Integer id) {
+        esporteService.deleteEsporte(id);
+        return ResponseEntity.ok("Esporte removido com sucesso.");
     }
-
 }

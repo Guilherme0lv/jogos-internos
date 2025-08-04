@@ -49,12 +49,11 @@ public class EventoService {
     }
 
     @Transactional
-    public EventoDTO deleteEvento(Integer eventoId) {
+    public void deleteEvento(Integer eventoId) {
         Evento evento = eventoRepository.findById(eventoId)
                 .orElseThrow(() -> new RuntimeException("Evento não encontrado."));
-        eventoRepository.delete(evento);
 
-        return EventoDTO.deModel(eventoRepository.save(evento));
+        eventoRepository.delete(evento);
     }
 
 }

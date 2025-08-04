@@ -51,6 +51,7 @@ public class EquipeService {
             throw new RuntimeException("Este técnico já está vinculado a uma equipe nesse esporte.");
         }
 
+
         Equipe equipe = form.paraModel(curso, esporte, campus, tecnico);
 
         equipe.setVitorias(0);
@@ -66,6 +67,12 @@ public class EquipeService {
     @Transactional
     private List<ParticipacaoEquipe> addUsuariosNaEquipe(Equipe equipe, List<Integer> usuarioIds) {
         List<Usuario> usuarios = usuarioRepository.findAllById(usuarioIds);
+
+        for (Usuario u : usuarios) {
+          if (u.getCurso() != equipe.getCurso()) {
+              throw new RuntimeException("Usuario não pertence ao curso da equipe.");
+          }
+        }
 
         if (usuarios.size() != usuarioIds.size()) {
             throw new RuntimeException("Um ou mais usuários não foram encontrados");

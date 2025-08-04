@@ -27,9 +27,5 @@ public class Curso {
     @Enumerated(EnumType.STRING)
     private CursoEnum tipoCurso;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "coordenador_id")
-    private Usuario coordenador;
-
 
 }

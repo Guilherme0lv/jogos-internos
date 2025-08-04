@@ -240,12 +240,11 @@ public class JogoService {
     }
 
     @Transactional
-    public JogoDTO deleteJogoById(Integer jogoId) {
+    public void deleteJogoById(Integer jogoId) {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
         jogoRepository.delete(jogo);
 
-        return JogoDTO.deModel(jogo);
     }
 
     @Transactional

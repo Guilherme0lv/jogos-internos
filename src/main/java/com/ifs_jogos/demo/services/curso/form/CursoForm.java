@@ -17,13 +17,11 @@ public class CursoForm {
 
     private String nome;
     private CursoEnum tipoCurso;
-    private Integer idCoordenador;
 
-    public Curso paraModel(Usuario coordenador) {
+    public Curso paraModel() {
         return Curso.builder()
                 .nome(nome)
                 .tipoCurso(tipoCurso)
-                .coordenador(coordenador)
                 .build();
     }
 }

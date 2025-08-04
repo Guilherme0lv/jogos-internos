@@ -15,11 +15,6 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    @PostMapping
-    public UsuarioDTO createUsuario(@RequestBody UsuarioForm usuario) {
-        return usuarioService.createUsuario(usuario);
-    }
-
     @GetMapping
     public List<UsuarioDTO> getUsuarios() {
         return usuarioService.getUsuarios();
@@ -40,7 +35,6 @@ public class UsuarioController {
         return usuarioService.findByTipoUsuario(tipoUsuario);
     }
 
-
     @PatchMapping("/update/{id}")
     public UsuarioDTO updateUsuario(@PathVariable("id") Integer id, @RequestBody UsuarioForm form) {
         return usuarioService.updateUsuario(id, form);
@@ -50,7 +44,5 @@ public class UsuarioController {
     public UsuarioDTO deleteUsuario(@PathVariable("id") Integer id) {
         return usuarioService.deleteUsuario(id);
     }
-
-
 
 }

@@ -25,14 +25,7 @@ public class CursoService {
 
     @Transactional
     public CursoDTO createCurso(CursoForm form) {
-        Usuario coordenador = usuarioRepository.findById(form.getIdCoordenador())
-                .orElseThrow(() ->  new RuntimeException("Coordenador não encontrado."));
-
-        if(coordenador.getTipoUsuario() != UsuarioEnum.COORDENADOR) {
-            throw new RuntimeException("O usuario informado não é um coordenador");
-        }
-
-        Curso curso = cursoRepository.save(form.paraModel(coordenador));
+        Curso curso = cursoRepository.save(form.paraModel());
 
         return CursoDTO.deModel(curso);
     }
@@ -75,12 +68,6 @@ public class CursoService {
 
         if (form.getNome() != null) existente.setNome(form.getNome());
         if (form.getTipoCurso()!=null) existente.setTipoCurso(form.getTipoCurso());
-        if(form.getIdCoordenador()!=null) {
-            Usuario coordenador = usuarioRepository.findById(form.getIdCoordenador()).orElseThrow(()->
-                new RuntimeException("Coordenador não encontrado."));
-
-            existente.setCoordenador(coordenador);
-        }
 
         return CursoDTO.deModel(cursoRepository.save(existente));
     }
