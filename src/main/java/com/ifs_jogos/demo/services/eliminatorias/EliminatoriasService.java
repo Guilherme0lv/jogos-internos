@@ -28,9 +28,11 @@ public class EliminatoriasService {
     private final UsuarioRepository usuarioRepository;
 
     @Transactional
-    public void gerarEliminatorias(Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId).orElseThrow(() ->
-                new RuntimeException("Esporte não encontrado."));
+    public void gerarEliminatorias(String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if(esporte==null) {
+            throw new RuntimeException("Esporte nao encontrado.");
+        }
 
         if (jogoRepository.existsEliminatoria(esporte)) {
             throw new RuntimeException("Esse esporte já tem jogos eliminatorios gerados.");
@@ -106,14 +108,15 @@ public class EliminatoriasService {
     }
 
     public void gerarProximaFase(FaseForm form) {
-        Esporte esporte = esporteRepository.findById(form.getIdEsporte()).orElseThrow(() ->
-                new RuntimeException("Esporte não encontrado."));
-
+        Esporte esporte = esporteRepository.findByNome(form.getNomeEsporte());
+        if(esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
         if(existeJogoEliminatorioPendente(form)) {
             throw new RuntimeException("A fase atual ainda não foi finalizada!");
         }
-
-        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(form.getFaseAtual(), esporte);
+        FaseEnum faseEnum = FaseEnum.valueOf(form.getFaseAtual());
+        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(faseEnum, esporte);
         List<Equipe> vencedores = new ArrayList<>();
 
         for (Jogo jogo : jogos) {
@@ -135,13 +138,13 @@ public class EliminatoriasService {
 
     private FaseEnum getFaseEnum(FaseForm form) {
         FaseEnum proximaFase = null;
-        if (form.getFaseAtual().paraString().equals("OITAVASFINAL")) {
+        if (form.getFaseAtual().equals("OITAVASFINAL")) {
             proximaFase = FaseEnum.QUARTASFINAL;
-        } else if(form.getFaseAtual().paraString().equals("QUARTASFINAL")) {
+        } else if(form.getFaseAtual().equals("QUARTASFINAL")) {
             proximaFase = FaseEnum.SEMIFINAL;
-        } else if (form.getFaseAtual().paraString().equals("SEMIFINAL")) {
+        } else if (form.getFaseAtual().equals("SEMIFINAL")) {
             proximaFase = FaseEnum.FINAL;
-        } else if(form.getFaseAtual().paraString().equals("FINAL")) {
+        } else if(form.getFaseAtual().equals("FINAL")) {
             proximaFase = null;
         } else {
             throw new RuntimeException("Fase inválida!");
@@ -212,11 +215,13 @@ public class EliminatoriasService {
     }
 
     private boolean existeJogoEliminatorioPendente(FaseForm form) {
-        Esporte esporte = esporteRepository.findById(form.getIdEsporte()).orElseThrow(() ->
-                new RuntimeException("Esporte não encontrado."));
-
+        Esporte esporte = esporteRepository.findByNome(form.getNomeEsporte());
+        if(esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
+        FaseEnum faseEnum = FaseEnum.valueOf(form.getFaseAtual());
         return jogoRepository
-                .existeJogoEliminatorioPendente(form.getFaseAtual(), JogoStatusEnum.PENDENTE, esporte);
+                .existeJogoEliminatorioPendente(faseEnum, JogoStatusEnum.PENDENTE, esporte);
     }
 
     private boolean isEquipeBye(Equipe equipe) {
@@ -225,7 +230,8 @@ public class EliminatoriasService {
 
     public EliminatoriasDTO getEliminatorias(FaseForm form) {
         EliminatoriasDTO eliminatorias = new EliminatoriasDTO();
-        eliminatorias.setJogos(jogoService.findByFaseAndEsporte(form.getFaseAtual(), form.getIdEsporte()));
+        FaseEnum faseEnum = FaseEnum.valueOf(form.getFaseAtual());
+        eliminatorias.setJogos(jogoService.findByFaseAndEsporte(form.getFaseAtual(), form.getNomeEsporte()));
 
         return eliminatorias;
     }

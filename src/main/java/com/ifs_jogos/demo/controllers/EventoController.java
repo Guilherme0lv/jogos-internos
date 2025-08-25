@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/eventos")
+@RequestMapping("/evento")
 public class EventoController {
 
     private final EventoService eventoService;
@@ -27,15 +27,15 @@ public class EventoController {
         return ResponseEntity.ok(eventos);
     }
 
-    @PatchMapping("/alterar/{eventoId}")
-    public ResponseEntity<EventoDTO> updateEvento(@PathVariable("eventoId") Integer eventoId, @RequestBody EventoForm form) {
-        EventoDTO dto = eventoService.updateEvento(eventoId, form);
+    @PutMapping("/update/{tipoEvento}")
+    public ResponseEntity<EventoDTO> updateEvento(@PathVariable("tipoEvento") String tipoEvento, @RequestBody EventoForm form) {
+        EventoDTO dto = eventoService.updateEvento(tipoEvento, form);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/deletar/{eventoId}")
-    public ResponseEntity<String> deleteEvento(@PathVariable("eventoId") Integer eventoId) {
-        eventoService.deleteEvento(eventoId);
+    @DeleteMapping("/delete/{tipoEvento}")
+    public ResponseEntity<String> deleteEvento(@PathVariable("tipoEvento") String tipoEvento) {
+        eventoService.deleteEvento(tipoEvento);
         return ResponseEntity.ok("Evento deletado com sucesso.");
     }
 }

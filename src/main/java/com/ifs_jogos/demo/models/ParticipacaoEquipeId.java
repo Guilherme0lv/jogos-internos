@@ -15,4 +15,5 @@ public class ParticipacaoEquipeId implements Serializable {
 
     private Integer usuarioId;
     private Integer equipeId;
+
 }

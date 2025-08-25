@@ -1,6 +1,7 @@
 package com.ifs_jogos.demo.services.evento.form;
 
 import com.ifs_jogos.demo.models.Evento;
+import com.ifs_jogos.demo.util.DataUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,14 +16,14 @@ import java.time.LocalDate;
 public class EventoForm {
 
     private String tipoEvento;
-    private LocalDate dataInicio;
-    private LocalDate dataFim;
+    private String dataInicio;
+    private String dataFim;
 
-    public Evento paraModel() {
+    public Evento paraModel(LocalDate dataInicioFormatada,  LocalDate dataFimFormatada) {
         return Evento.builder()
                 .tipoEvento(tipoEvento)
-                .dataInicio(dataInicio)
-                .dataFim(dataFim)
+                .dataInicio(dataInicioFormatada)
+                .dataFim(dataFimFormatada)
                 .build();
     }
 }

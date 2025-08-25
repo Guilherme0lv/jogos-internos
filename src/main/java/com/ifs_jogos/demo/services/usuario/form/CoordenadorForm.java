@@ -16,7 +16,7 @@ public class CoordenadorForm {
 
     private String matricula;
     private String nomeCompleto;
-    private Integer cursoId;
+    private String cursoNome;
     private String apelido;
     private String telefone;
 

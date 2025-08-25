@@ -30,15 +30,15 @@ public class CampusController {
         return ResponseEntity.ok(list);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<CampusDTO> updateCampus(@PathVariable("id") Integer id, @RequestBody CampusForm form) {
-        CampusDTO updated = campusService.updateCampus(id, form);
+    @PutMapping("/update/{nome}")
+    public ResponseEntity<CampusDTO> updateCampus(@PathVariable("nome") String nome, @RequestBody CampusForm form) {
+        CampusDTO updated = campusService.updateCampus(nome, form);
         return ResponseEntity.ok(updated);
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deleteCampus(@PathVariable("id") Integer id) {
-        campusService.deleteCampus(id);
+    @DeleteMapping("/delete/{nome}")
+    public ResponseEntity<String> deleteCampus(@PathVariable("nome") String nome) {
+        campusService.deleteCampus(nome);
         return ResponseEntity.ok("Campus deletado com sucesso.");
     }
 }

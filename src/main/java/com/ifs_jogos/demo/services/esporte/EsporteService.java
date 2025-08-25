@@ -26,8 +26,11 @@ public class EsporteService {
 
     @Transactional
     public EsporteDTO createEsporte(EsporteForm form) {
-        Evento evento = eventoRepository.findById(form.getEventoId())
-                .orElseThrow(() -> new RuntimeException("Evento não encontrado."));
+        Evento evento = eventoRepository.findByTipoEvento(form.getEvento());
+
+        if (evento==null) {
+            throw new RuntimeException("Evento não encontrado.");
+        }
 
         Esporte esporte = esporteRepository.save(form.paraModel(evento));
 
@@ -54,9 +57,11 @@ public class EsporteService {
     }
 
     @Transactional
-    public EquipeDTO getCampeao(Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public EquipeDTO getCampeao(String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte nao encontrado.");
+        }
 
         if (!jogoRepository.findByStatusAndGrupo_Esporte(JogoStatusEnum.PENDENTE, esporte).isEmpty()) {
             throw new RuntimeException("Ainda há jogos.");
@@ -94,9 +99,12 @@ public class EsporteService {
     }
 
     @Transactional
-    public EsporteDTO updateEsporte(Integer id, EsporteForm form) {
-        Esporte existente = esporteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public EsporteDTO updateEsporte(String nome, EsporteForm form) {
+        Esporte existente = esporteRepository.findByNome(nome);
+
+        if (existente==null) {
+            throw new RuntimeException("Esporte não encontrado.");
+        }
 
         if (form.getNome()!=null) existente.setNome(form.getNome());
         if (form.getMinAtletas()!=null) existente.setMinAtletas(form.getMinAtletas());
@@ -106,9 +114,13 @@ public class EsporteService {
     }
 
     @Transactional
-    public EsporteDTO deleteEsporte(Integer id) {
-        Esporte esporte = esporteRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public EsporteDTO deleteEsporte(String nome) {
+        Esporte esporte = esporteRepository.findByNome(nome);
+
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado.");
+        }
+
 
         esporteRepository.delete(esporte);
 

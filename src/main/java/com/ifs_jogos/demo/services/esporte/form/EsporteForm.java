@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 public class EsporteForm {
 
     private String nome;
-    private Integer eventoId;
+    private String evento;
     private Integer minAtletas;
     private Integer maxAtletas;
 

@@ -19,6 +19,7 @@ public class UsuarioDTO {
     private String apelido;
     private String telefone;
     private UsuarioEnum tipoUsuario;
+    private String cursoNome;
 
     public static UsuarioDTO deModel(Usuario usuario) {
         return UsuarioDTO.builder()
@@ -27,6 +28,7 @@ public class UsuarioDTO {
                 .apelido(usuario.getApelido())
                 .telefone(usuario.getTelefone())
                 .tipoUsuario(usuario.getTipoUsuario())
+                .cursoNome(usuario.getCurso().getNome())
                 .build();
     }
 

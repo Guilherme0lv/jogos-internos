@@ -35,21 +35,21 @@ public class EsporteController {
         return ResponseEntity.ok(dto);
     }
 
-    @PatchMapping("/campeao/{esporteId}")
-    public ResponseEntity<EquipeDTO> getCampeao(@PathVariable("esporteId") Integer esporteId) {
-        EquipeDTO campeao = esporteService.getCampeao(esporteId);
+    @PutMapping("/campeao/{esporteNome}")
+    public ResponseEntity<EquipeDTO> getCampeao(@PathVariable("esporteNome") String esporteNome) {
+        EquipeDTO campeao = esporteService.getCampeao(esporteNome);
         return ResponseEntity.ok(campeao);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<EsporteDTO> updateEsporte(@PathVariable("id") Integer id, @RequestBody EsporteForm form) {
-        EsporteDTO dto = esporteService.updateEsporte(id, form);
+    @PutMapping("/update/{nome}")
+    public ResponseEntity<EsporteDTO> updateEsporte(@PathVariable("nome") String nome, @RequestBody EsporteForm form) {
+        EsporteDTO dto = esporteService.updateEsporte(nome, form);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteEsporte(@PathVariable("id") Integer id) {
-        esporteService.deleteEsporte(id);
+    @DeleteMapping("/delete/{nome}")
+    public ResponseEntity<String> deleteEsporte(@PathVariable("nome") String nome) {
+        esporteService.deleteEsporte(nome);
         return ResponseEntity.ok("Esporte removido com sucesso.");
     }
 }

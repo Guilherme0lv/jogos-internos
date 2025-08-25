@@ -28,11 +28,15 @@ public class JogoService {
     private final EsporteRepository esporteRepository;
 
     @Transactional
-    public List<JogoDTO> gerarJogos(Integer grupoId) {
-        Grupo grupo = grupoRepository.findById(grupoId)
-                .orElseThrow(() -> new RuntimeException("Grupo não encontrado."));
-
-        List<Equipe> equipes = grupo.getEquipes();
+    public List<JogoDTO> gerarJogos(String grupoNome) {
+        Grupo grupo = grupoRepository.findByNome(grupoNome);
+        if (grupo==null) {
+            throw new RuntimeException("Jogo não encontrado");
+        }
+        List<Equipe> equipes = equipeRepository.findByGrupo(grupo);
+        if (equipes == null || equipes.size() < 2) {
+            throw new RuntimeException("Número insuficiente de equipes no grupo para gerar jogos.");
+        }
 
         Evento evento = grupo.getEsporte().getEvento();
 
@@ -92,9 +96,11 @@ public class JogoService {
                 .toList();
     }
 
-    public List<JogoDTO> findByStatus(JogoStatusEnum status, Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public List<JogoDTO> findByStatus(JogoStatusEnum status, String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
 
         return jogoRepository.findByStatusAndGrupo_Esporte(status, esporte)
                 .stream()
@@ -102,18 +108,23 @@ public class JogoService {
                 .toList();
     }
 
-    public List<JogoDTO> findByFaseAndEsporte(FaseEnum fase, Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public List<JogoDTO> findByFaseAndEsporte(String fase, String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
+        FaseEnum faseEnum = FaseEnum.valueOf(fase);
 
-        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(fase, esporte);
+        List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(faseEnum, esporte);
 
         return jogos.stream().map(JogoDTO::deModel).toList();
     }
 
-    public List<JogoDTO> findByGrupo(Integer grupoId) {
-        Grupo grupo = grupoRepository.findById(grupoId)
-                .orElseThrow(() -> new RuntimeException("Grupo não encontrado."));
+    public List<JogoDTO> findByGrupo(String grupoNome) {
+        Grupo grupo = grupoRepository.findByNome(grupoNome);
+        if (grupo==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
 
         return jogoRepository.findByGrupo(grupo)
                 .stream()
@@ -165,7 +176,7 @@ public class JogoService {
     }
 
     @Transactional
-    public JogoDTO aplicarWO(Integer jogoId, Integer idEquipeVencedora) {
+    public JogoDTO aplicarWO(Integer jogoId, String nomeEquipe) {
         Jogo jogo = jogoRepository.findById(jogoId)
                 .orElseThrow(() -> new RuntimeException("Jogo não encontrado."));
 
@@ -174,7 +185,7 @@ public class JogoService {
         }
         Equipe equipeA = jogo.getEquipeA();
         Equipe equipeB = jogo.getEquipeB();
-        if (idEquipeVencedora.equals(jogo.getEquipeA().getId())) {
+        if (nomeEquipe.equals(jogo.getEquipeA().getNome())) {
             jogo.setPlacarEquipeA(1);
             jogo.setPlacarEquipeB(0);
             if (jogo.getFase() == FaseEnum.GRUPO) {
@@ -183,7 +194,7 @@ public class JogoService {
                 equipeB.setDerrotas(equipeB.getDerrotas() + 1);
             }
 
-        } else if (idEquipeVencedora.equals(jogo.getEquipeB().getId())){
+        } else if (nomeEquipe.equals(jogo.getEquipeB().getNome())){
             jogo.setPlacarEquipeA(0);
             jogo.setPlacarEquipeB(1);
             if (jogo.getFase() == FaseEnum.GRUPO) {
@@ -253,9 +264,11 @@ public class JogoService {
     }
 
     @Transactional
-    public void deleteAllJogosDeGrupo(Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public void deleteAllJogosDeGrupo(String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
 
         List<Jogo> jogos = jogoRepository.findByFaseAndEquipeA_Esporte(FaseEnum.GRUPO, esporte);
 

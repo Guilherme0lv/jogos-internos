@@ -10,7 +10,7 @@ import java.util.List;
 public interface EquipeRepository extends JpaRepository<Equipe, Integer> {
 
     Equipe findByNome(String nome);
-
+    List<Equipe> findByGrupo(Grupo grupo);
     List<Equipe> findByCurso(Curso curso);
 
     List<Equipe> findByEsporte(Esporte esporte);

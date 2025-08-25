@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FaseForm {
 
-    private Integer idEsporte;
-    private FaseEnum faseAtual;
+    private String nomeEsporte;
+    private String faseAtual;
 
 }

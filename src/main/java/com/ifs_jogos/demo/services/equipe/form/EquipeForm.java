@@ -15,11 +15,11 @@ import java.util.List;
 public class EquipeForm {
 
     private String nome;
-    private Integer cursoId;
-    private Integer esporteId;
-    private Integer campusId;
-    private Integer tecnicoId;
-    private List<Integer> atletasId;
+    private String cursoNome;
+    private String esporteNome;
+    private String campusNome;
+    private String tecnicoMatricula;
+    private List<String> atletasMatricula;
 
     public Equipe paraModel(Curso curso, Esporte esporte, Campus campus, Usuario tecnico) {
         return Equipe.builder()

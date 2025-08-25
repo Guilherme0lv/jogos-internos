@@ -12,14 +12,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CampusDTO {
-
-    private Integer id;
     private String nome;
     private String cidade;
 
     public static CampusDTO deModel(Campus campus) {
         return CampusDTO.builder()
-                .id(campus.getId())
+
                 .nome(campus.getNome())
                 .cidade(campus.getCidade())
                 .build();

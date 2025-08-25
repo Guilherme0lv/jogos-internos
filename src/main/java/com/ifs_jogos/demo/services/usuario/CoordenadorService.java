@@ -23,11 +23,13 @@ public class CoordenadorService {
 
     @Transactional
     public void createCoordenador(CoordenadorForm form) {
-        if (usuarioRepository.existsByTipoUsuarioAndCurso_Id(UsuarioEnum.COORDENADOR, form.getCursoId())) {
+        if (usuarioRepository.existsByTipoUsuarioAndCurso_Nome(UsuarioEnum.COORDENADOR, form.getCursoNome())) {
             throw new RuntimeException("Já existe um coordenador nesse curso");
         }
-        Curso curso = cursoRepository.findById(form.getCursoId())
-                .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
+        Curso curso = cursoRepository.findByNome(form.getCursoNome());
+         if(curso==null) {
+             throw new RuntimeException("Curso não encontrado");
+         }
 
         Usuario coordenador = form.paraModel(curso);
         coordenador.setSenha(gerarSenha());
@@ -38,9 +40,11 @@ public class CoordenadorService {
     }
 
     @Transactional
-    public UsuarioDTO definirTecnico(Integer usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow( () -> new RuntimeException("Usuario não encontrado."));
+    public UsuarioDTO definirTecnico(String usuarioMatricula) {
+        Usuario usuario = usuarioRepository.findByMatricula(usuarioMatricula);
+        if (usuario==null) {
+            throw new RuntimeException("Usuario nao encontrado");
+        }
 
         usuario.setTipoUsuario(UsuarioEnum.TECNICO);
 
@@ -57,9 +61,11 @@ public class CoordenadorService {
         return sb.toString();
     }
 
-    public String enviarSenhaPorEmail(Integer coordenadorId) {
-        Usuario coordenador = usuarioRepository.findById(coordenadorId)
-                .orElseThrow( () -> new RuntimeException("Coordenador não encontrado."));
+    public String enviarSenhaPorEmail(String coordenadorMatricula) {
+        Usuario coordenador = usuarioRepository.findByMatricula(coordenadorMatricula);
+        if(coordenador==null){
+             throw new RuntimeException("Coordenador não encontrado.");
+        }
 
         if (coordenador.getTipoUsuario() != UsuarioEnum.COORDENADOR) {
             throw new RuntimeException("Usuario informado não é um coordenador");

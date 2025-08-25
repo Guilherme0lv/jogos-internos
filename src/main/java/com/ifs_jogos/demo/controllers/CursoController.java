@@ -40,15 +40,15 @@ public class CursoController {
         return ResponseEntity.ok(cursos);
     }
 
-    @PatchMapping("/update/{id}")
-    public ResponseEntity<CursoDTO> updateCurso(@PathVariable("id") Integer id, @RequestBody CursoForm form) {
-        CursoDTO dto = cursoService.updateCurso(id, form);
+    @PutMapping("/update/{nome}")
+    public ResponseEntity<CursoDTO> updateCurso(@PathVariable("nome") String nome, @RequestBody CursoForm form) {
+        CursoDTO dto = cursoService.updateCurso(nome, form);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/id/{id}")
-    public ResponseEntity<CursoDTO> deleteCurso(@PathVariable("id") Integer id) {
-        CursoDTO dto = cursoService.deleteCurso(id);
+    @DeleteMapping("/delete/{nome}")
+    public ResponseEntity<CursoDTO> deleteCurso(@PathVariable("nome") String nome) {
+        CursoDTO dto = cursoService.deleteCurso(nome);
         return ResponseEntity.ok(dto);
     }
 }

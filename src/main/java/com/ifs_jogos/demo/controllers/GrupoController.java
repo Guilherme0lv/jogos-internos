@@ -18,10 +18,10 @@ public class GrupoController {
 
     private final GrupoService grupoService;
 
-    @PostMapping("/gerar/{esporteId}")
-    public ResponseEntity<String> gerarGrupos(@PathVariable("esporteId") Integer esporteId) {
-        grupoService.gerarGrupos(esporteId);
-        return ResponseEntity.status(201).body("Grupos gerados com sucesso.");
+    @PostMapping("/gerar/{esporteNome}")
+    public ResponseEntity<List<GrupoDTO>> gerarGrupos(@PathVariable("esporteNome") String esporteNome) {
+        List<GrupoDTO> dto = grupoService.gerarGrupos(esporteNome);
+        return ResponseEntity.status(201).body(dto);
     }
 
     @GetMapping
@@ -30,15 +30,15 @@ public class GrupoController {
         return ResponseEntity.ok(grupos);
     }
 
-    @GetMapping("/classificacao/{grupoId}")
-    public ResponseEntity<List<ClassificacaoDTO>> getClassificacao(@PathVariable("grupoId") Integer grupoId) {
-        List<ClassificacaoDTO> classificacao = grupoService.getClassificacao(grupoId);
+    @GetMapping("/classificacao/{grupoNome}")
+    public ResponseEntity<List<ClassificacaoDTO>> getClassificacao(@PathVariable("grupoNome") String grupoNome) {
+        List<ClassificacaoDTO> classificacao = grupoService.getClassificacao(grupoNome);
         return ResponseEntity.ok(classificacao);
     }
 
-    @GetMapping("/esporte/{esporteId}")
-    public ResponseEntity<List<GrupoDTO>> findByEsporte(@PathVariable("esporteId") Integer esporteId) {
-        List<GrupoDTO> grupos = grupoService.findByEsporte(esporteId);
+    @GetMapping("/esporte/{nomeEsporte}")
+    public ResponseEntity<List<GrupoDTO>> findByEsporte(@PathVariable("nomeEsporte") String nomeEsporte) {
+        List<GrupoDTO> grupos = grupoService.findByEsporte(nomeEsporte);
         return ResponseEntity.ok(grupos);
     }
 
@@ -46,6 +46,12 @@ public class GrupoController {
     public ResponseEntity<String> deleteGrupos() {
         grupoService.deleteGrupos();
         return ResponseEntity.ok("Todos os grupos foram deletados com sucesso.");
+    }
+
+    @DeleteMapping("/delete-by-esporte/{esporteNome}")
+    public ResponseEntity<String> deleteByEsporte(@PathVariable("esporteNome") String esporteNome) {
+        grupoService.deleteGrupoByEsporte(esporteNome);
+        return ResponseEntity.ok("Grupos deletados com sucesso.");
     }
 
     @DeleteMapping("/delete/{grupoId}")

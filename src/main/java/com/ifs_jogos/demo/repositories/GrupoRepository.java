@@ -11,5 +11,8 @@ import java.util.List;
 public interface GrupoRepository extends JpaRepository<Grupo, Integer> {
 
     List<Grupo> findByEsporte(Esporte esporte);
+    Grupo findByNome(String nome);
+
+    void deleteGrupoByEsporte(Esporte esporte);
 
 }

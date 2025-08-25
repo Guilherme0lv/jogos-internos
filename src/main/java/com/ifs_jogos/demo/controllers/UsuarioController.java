@@ -35,14 +35,14 @@ public class UsuarioController {
         return usuarioService.findByTipoUsuario(tipoUsuario);
     }
 
-    @PatchMapping("/update/{id}")
-    public UsuarioDTO updateUsuario(@PathVariable("id") Integer id, @RequestBody UsuarioForm form) {
-        return usuarioService.updateUsuario(id, form);
+    @PutMapping("/update/{matricula}")
+    public UsuarioDTO updateUsuario(@PathVariable("matricula") String matricula, @RequestBody UsuarioForm form) {
+        return usuarioService.updateUsuario(matricula, form);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public UsuarioDTO deleteUsuario(@PathVariable("id") Integer id) {
-        return usuarioService.deleteUsuario(id);
+    @DeleteMapping("/delete/{matricula}")
+    public UsuarioDTO deleteUsuario(@PathVariable("matricula") String matricula) {
+        return usuarioService.deleteUsuario(matricula);
     }
 
 }

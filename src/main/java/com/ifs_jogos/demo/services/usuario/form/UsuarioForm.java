@@ -20,7 +20,7 @@ public class UsuarioForm {
     private String apelido;
     private String telefone;
     private UsuarioEnum tipoUsuario;
-    private Integer cursoId;
+    private String cursoNome;
 
     public Usuario paraModel(Curso curso) {
         return Usuario.builder()

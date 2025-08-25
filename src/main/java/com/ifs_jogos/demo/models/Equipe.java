@@ -49,7 +49,7 @@ public class Equipe {
     @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tecnico_id")
     private Usuario tecnico;
 

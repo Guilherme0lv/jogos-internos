@@ -7,7 +7,7 @@ import java.util.Base64;
 public class PasswordUtils {
 
     private static final String ALGORITHM = "AES";
-    private static final byte[] KEY = "1234567890123456".getBytes(); // chave de 16 bytes (exemplo)
+    private static final byte[] KEY = "1234567890123456".getBytes();
 
     public static String encrypt(String password) {
         try {
@@ -21,7 +21,6 @@ public class PasswordUtils {
         }
     }
 
-    // Método para descriptografar a senha
     public static String decrypt(String encryptedPassword) {
         try {
             SecretKeySpec key = new SecretKeySpec(KEY, ALGORITHM);

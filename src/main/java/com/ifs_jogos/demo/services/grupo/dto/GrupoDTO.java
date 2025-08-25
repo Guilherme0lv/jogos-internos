@@ -3,7 +3,6 @@ package com.ifs_jogos.demo.services.grupo.dto;
 import com.ifs_jogos.demo.models.Equipe;
 import com.ifs_jogos.demo.models.Grupo;
 import com.ifs_jogos.demo.models.Jogo;
-import com.ifs_jogos.demo.services.equipe.dto.EquipeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +20,7 @@ import java.util.Optional;
 public class GrupoDTO {
 
     private String nome;
-    private String nomeEsporte;
+    private String esporteNome;
     private List<String> equipes;
     private List<String> jogos;
 
@@ -29,7 +28,7 @@ public class GrupoDTO {
 
         return GrupoDTO.builder()
                 .nome(grupo.getNome())
-                .nomeEsporte(grupo.getEsporte().getNome())
+                .esporteNome(grupo.getEsporte().getNome())
                 .equipes(Optional.ofNullable(grupo.getEquipes())
                             .orElse(Collections.emptyList())
                             .stream()
@@ -40,18 +39,20 @@ public class GrupoDTO {
     }
 
     public static List<String> formatarJogos(List<Jogo> jogos) {
+        if (jogos!=null) {
+            List<String> jogosFormatados = new ArrayList<>(jogos.size());
 
-        List<String> jogosFormatados = new ArrayList<>(jogos.size());
+            for (Jogo jogo : jogos) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(jogo.getEquipeA().getNome())
+                        .append(" x ")
+                        .append(jogo.getEquipeB().getNome());
 
-        for (Jogo jogo : jogos) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(jogo.getEquipeA().getNome())
-                    .append(" x ")
-                    .append(jogo.getEquipeB().getNome());
+                jogosFormatados.add(sb.toString());
+            }
 
-            jogosFormatados.add(sb.toString());
+            return jogosFormatados;
         }
-
-        return jogosFormatados;
+        return null;
     }
 }

@@ -1,14 +1,12 @@
 package com.ifs_jogos.demo.controllers;
 
 import com.ifs_jogos.demo.services.usuario.UsuarioService;
+import com.ifs_jogos.demo.services.usuario.dto.UsuarioDTO;
 import com.ifs_jogos.demo.services.usuario.form.LoginForm;
 import com.ifs_jogos.demo.services.usuario.form.UsuarioForm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +22,11 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginForm form) {
-        boolean autenticado = usuarioService.autenticar(form);
+    public ResponseEntity<?> login(@RequestBody LoginForm form) {
+        UsuarioDTO autenticado = usuarioService.autenticar(form);
 
-        if (autenticado) {
-            return ResponseEntity.ok("Login realizado com sucesso.");
+        if (autenticado != null) {
+            return ResponseEntity.ok(autenticado);
         } else {
             return ResponseEntity.status(401).body("Email ou senha inválidos.");
         }

@@ -62,9 +62,11 @@ public class CursoService {
 
 
     @Transactional
-    public CursoDTO updateCurso(Integer id, CursoForm form) {
-        Curso existente = cursoRepository.findById(id).orElseThrow( () ->
-                new RuntimeException("Curso não encontrado."));
+    public CursoDTO updateCurso(String nome, CursoForm form) {
+        Curso existente = cursoRepository.findByNome(nome);
+        if(existente==null) {
+            throw new RuntimeException("Curso não encontrado.");
+        }
 
         if (form.getNome() != null) existente.setNome(form.getNome());
         if (form.getTipoCurso()!=null) existente.setTipoCurso(form.getTipoCurso());
@@ -73,9 +75,12 @@ public class CursoService {
     }
 
     @Transactional
-    public CursoDTO deleteCurso(Integer id) {
-        Curso curso = cursoRepository.findById(id).orElseThrow( () ->
-                new RuntimeException("Curso não encontrado."));
+    public CursoDTO deleteCurso(String nome) {
+        Curso curso = cursoRepository.findByNome(nome);
+
+        if (curso==null) {
+            throw new RuntimeException("Curso não encontrado.");
+        }
 
         cursoRepository.delete(curso);
         return CursoDTO.deModel(curso);

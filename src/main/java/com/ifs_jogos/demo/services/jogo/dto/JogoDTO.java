@@ -26,6 +26,7 @@ public class JogoDTO {
     private String nomeEquipeB;
     private Integer placarEquipeA;
     private Integer placarEquipeB;
+    private String fase;
     private String status;
 
     public static JogoDTO deModel(Jogo jogo) {
@@ -38,6 +39,7 @@ public class JogoDTO {
                 .placarEquipeA(jogo.getPlacarEquipeA())
                 .placarEquipeB(jogo.getPlacarEquipeB())
                 .status(jogo.getStatus().paraString())
+                .fase(jogo.getFase().paraString())
                 .build();
     }
 

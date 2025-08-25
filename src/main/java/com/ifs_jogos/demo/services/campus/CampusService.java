@@ -34,9 +34,11 @@ public class CampusService {
     }
 
     @Transactional
-    public CampusDTO updateCampus(Integer id, CampusForm form) {
-        Campus existente = campusRepository.findById(id).orElseThrow( () ->
-                new RuntimeException("Campus não encontrado."));
+    public CampusDTO updateCampus(String nome, CampusForm form) {
+        Campus existente = campusRepository.findByNome(nome);
+        if(existente==null) {
+           throw new RuntimeException("Campus não encontrado.");
+        }
 
         if (form.getCidade()!=null) existente.setCidade(form.getCidade());
         if (form.getNome()!=null) existente.setNome(form.getNome());
@@ -45,9 +47,11 @@ public class CampusService {
     }
 
     @Transactional
-    public void deleteCampus(Integer id) {
-        Campus campus = campusRepository.findById(id).orElseThrow( () ->
-                new RuntimeException("Campus não encontrado."));
+    public void deleteCampus(String nome) {
+        Campus campus = campusRepository.findByNome(nome);
+        if(campus==null) {
+            throw new RuntimeException("Campus não encontrado.");
+        }
 
         campusRepository.delete(campus);
     }

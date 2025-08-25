@@ -13,14 +13,14 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/jogos")
+@RequestMapping("/jogo")
 public class JogoController {
 
     private final JogoService jogoService;
 
-    @PostMapping("/gerarJogos/{grupoId}")
-    public ResponseEntity<List<JogoDTO>> gerarJogos(@PathVariable("grupoId") Integer grupoId) {
-        List<JogoDTO> jogos = jogoService.gerarJogos(grupoId);
+    @PostMapping("/gerarJogos/{grupoNome}")
+    public ResponseEntity<List<JogoDTO>> gerarJogos(@PathVariable("grupoNome") String grupoNome) {
+        List<JogoDTO> jogos = jogoService.gerarJogos(grupoNome);
         return ResponseEntity.status(201).body(jogos);
     }
 
@@ -30,40 +30,40 @@ public class JogoController {
         return ResponseEntity.ok(jogos);
     }
 
-    @GetMapping("/finalizados/{statusJogo}/{esporteId}")
+    @GetMapping("/finalizados/{statusJogo}/{esporteNome}")
     public ResponseEntity<List<JogoDTO>> findByStatus(@PathVariable("statusJogo") JogoStatusEnum status,
-                                                      @PathVariable("esporteId") Integer esporteId) {
-        List<JogoDTO> jogos = jogoService.findByStatus(status, esporteId);
+                                                      @PathVariable("esporteNome") String esporteNome) {
+        List<JogoDTO> jogos = jogoService.findByStatus(status, esporteNome);
         return ResponseEntity.ok(jogos);
     }
 
-    @GetMapping("/grupo/{grupoId}")
-    public ResponseEntity<List<JogoDTO>> findByGrupo(@PathVariable("grupoId") Integer grupoId) {
-        List<JogoDTO> jogos = jogoService.findByGrupo(grupoId);
+    @GetMapping("/grupo/{grupoNome}")
+    public ResponseEntity<List<JogoDTO>> findByGrupo(@PathVariable("grupoNome") String grupoNome) {
+        List<JogoDTO> jogos = jogoService.findByGrupo(grupoNome);
         return ResponseEntity.ok(jogos);
     }
 
-    @GetMapping("/fase/esporte/{esporteId}")
-    public ResponseEntity<List<JogoDTO>> findByFase(@PathVariable("esporteId") Integer esporteId,
-                                                              @RequestBody FaseEnum fase) {
-        List<JogoDTO> jogos = jogoService.findByFaseAndEsporte(fase, esporteId);
+    @GetMapping("/fase/esporte/{esporteNome}")
+    public ResponseEntity<List<JogoDTO>> findByFase(@PathVariable("esporteNome") String esporteNome,
+                                                    @RequestParam("fase") String fase) {
+        List<JogoDTO> jogos = jogoService.findByFaseAndEsporte(fase, esporteNome);
         return ResponseEntity.ok(jogos);
     }
 
-    @PatchMapping("/finalizar")
+    @PutMapping("/finalizar")
     public ResponseEntity<JogoDTO> finalizarJogo(@RequestBody PlacarForm form) {
         JogoDTO dto = jogoService.finalizarJogo(form);
         return ResponseEntity.ok(dto);
     }
 
-    @PatchMapping("/aplicarWO/{id}/equipe/{idEquipe}")
-    public ResponseEntity<JogoDTO> aplicarWO(@PathVariable("id") Integer idJogo,
-                                             @PathVariable("idEquipe") Integer idEquipe) {
-        JogoDTO dto = jogoService.aplicarWO(idJogo, idEquipe);
+    @PutMapping("/aplicarWO/{jogoId}/equipeWin/{equipeNome}")
+    public ResponseEntity<JogoDTO> aplicarWO(@PathVariable("jogoId") Integer idJogo,
+                                             @PathVariable("equipeNome") String equipeNome) {
+        JogoDTO dto = jogoService.aplicarWO(idJogo, equipeNome);
         return ResponseEntity.ok(dto);
     }
 
-    @PatchMapping("/desfazerWO/{id}")
+    @PutMapping("/desfazerWO/{id}")
     public ResponseEntity<JogoDTO> desfazerWO(@PathVariable("id") Integer idJogo) {
         JogoDTO dto = jogoService.desfazerWO(idJogo);
         return ResponseEntity.ok(dto);
@@ -75,9 +75,9 @@ public class JogoController {
         return ResponseEntity.ok("Todos os jogos foram deletados com sucesso.");
     }
 
-    @DeleteMapping("/deleteAllJogosGrupo/{esporteId}")
-    public ResponseEntity<String> deleteAllJogosDeGrupo(@PathVariable("esporteId") Integer esporteId) {
-        jogoService.deleteAllJogosDeGrupo(esporteId);
+    @DeleteMapping("/deleteAllJogosGrupo/{esporteNome}")
+    public ResponseEntity<String> deleteAllJogosDeGrupo(@PathVariable("esporteNome") String esporteNome) {
+        jogoService.deleteAllJogosDeGrupo(esporteNome);
         return ResponseEntity.ok("Todos os jogos do grupo foram deletados com sucesso.");
     }
 

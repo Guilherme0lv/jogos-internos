@@ -41,9 +41,9 @@ public class EquipeController {
         return ResponseEntity.ok(equipes);
     }
 
-    @GetMapping("/esporte/{esporteId}")
-    public ResponseEntity<List<EquipeDTO>> findByEsporte(@PathVariable("esporteId") Integer esporteId) {
-        List<EquipeDTO> equipes = equipeService.findByEsporte(esporteId);
+    @GetMapping("/buscar-por-esporte/{nomeEsporte}")
+    public ResponseEntity<List<EquipeDTO>> findByEsporte(@PathVariable("nomeEsporte") String nomeEsporte) {
+        List<EquipeDTO> equipes = equipeService.findByEsporte(nomeEsporte);
         return ResponseEntity.ok(equipes);
     }
 
@@ -53,15 +53,15 @@ public class EquipeController {
         return ResponseEntity.ok(equipes);
     }
 
-    @PatchMapping("/update/{equipeId}")
-    public ResponseEntity<EquipeDTO> updateEquipe(@PathVariable("equipeId") Integer equipeId, @RequestBody EquipeForm equipeForm) {
-        EquipeDTO dto = equipeService.updateEquipe(equipeId, equipeForm);
+    @PutMapping("/update/{nome}")
+    public ResponseEntity<EquipeDTO> updateEquipe(@PathVariable("nome") String nome, @RequestBody EquipeForm equipeForm) {
+        EquipeDTO dto = equipeService.updateEquipe(nome, equipeForm);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<String> deleteEquipe(@PathVariable("id") Integer id) {
-        equipeService.deleteEquipe(id);
+    @DeleteMapping("/delete/{nomeEquipe}")
+    public ResponseEntity<String> deleteEquipe(@PathVariable("nomeEquipe") String nomeEquipe) {
+        equipeService.deleteEquipe(nomeEquipe);
         return ResponseEntity.ok("Equipe removida com sucesso.");
     }
 

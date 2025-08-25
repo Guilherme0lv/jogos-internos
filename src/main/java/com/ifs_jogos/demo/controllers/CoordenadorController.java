@@ -21,15 +21,15 @@ public class CoordenadorController {
         return ResponseEntity.status(201).body("Coordenador cadastrado com sucesso");
     }
 
-    @PatchMapping("/definir-tecnico/{usuarioId}")
-    public ResponseEntity<UsuarioDTO> definirTecnico(@PathVariable("usuarioId") Integer usuarioId) {
-        UsuarioDTO dto = coordenadorService.definirTecnico(usuarioId);
+    @PutMapping("/definir-tecnico/{usuarioMatricula}")
+    public ResponseEntity<UsuarioDTO> definirTecnico(@PathVariable("usuarioMatricula") String usuarioMatricula) {
+        UsuarioDTO dto = coordenadorService.definirTecnico(usuarioMatricula);
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/getLogin/{coordenadorId}")
-    public ResponseEntity<String> enviarLoginPorEmail(@PathVariable("coordenadorId") Integer coordenadorId) {
-        String mensagem = coordenadorService.enviarSenhaPorEmail(coordenadorId);
+    @GetMapping("/getLogin/{coordenadorMatricula}")
+    public ResponseEntity<String> enviarLoginPorEmail(@PathVariable("coordenadorMatricula") String coordenadorMatricula) {
+        String mensagem = coordenadorService.enviarSenhaPorEmail(coordenadorMatricula);
         return ResponseEntity.ok(mensagem);
     }
 }

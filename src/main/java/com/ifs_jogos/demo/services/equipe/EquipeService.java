@@ -23,23 +23,28 @@ public class EquipeService {
 
     @Transactional
     public EquipeDTO createEquipe(EquipeForm form) {
-        Curso curso = cursoRepository.findById(form.getCursoId())
-                .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
-
-        Esporte esporte = esporteRepository.findById(form.getEsporteId())
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
-
-        Campus campus = campusRepository.findById(form.getCampusId())
-                .orElseThrow(() -> new RuntimeException("Campus não encontrado."));
-
-        Usuario tecnico = usuarioRepository.findById(form.getTecnicoId())
-                .orElseThrow( () -> new RuntimeException("Tecnico não encontrado."));
+        Curso curso = cursoRepository.findByNome(form.getCursoNome());
+        if (curso==null) {
+            throw new RuntimeException("Curso não encontrado.");
+        }
+        Esporte esporte = esporteRepository.findByNome(form.getEsporteNome());
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado.");
+        }
+        Campus campus = campusRepository.findByNome(form.getCampusNome());
+        if (campus==null) {
+            throw new RuntimeException("Campus não encontrado.");
+        }
+        Usuario tecnico = usuarioRepository.findByMatricula(form.getTecnicoMatricula());
+        if (tecnico==null) {
+            throw new RuntimeException("Tecnico não encontrado.");
+        }
 
         if (equipeRepository.existsByCursoAndEsporte(curso, esporte)) {
             throw new RuntimeException("Já existe equipe desse curso cadastrada.");
         }
 
-        if (form.getAtletasId().size() < esporte.getMinAtletas() || form.getAtletasId().size() > esporte.getMaxAtletas()) {
+        if (form.getAtletasMatricula().size() < esporte.getMinAtletas() || form.getAtletasMatricula().size() > esporte.getMaxAtletas()) {
             throw new RuntimeException("Tamanho invalido da equipe");
         }
 
@@ -51,7 +56,6 @@ public class EquipeService {
             throw new RuntimeException("Este técnico já está vinculado a uma equipe nesse esporte.");
         }
 
-
         Equipe equipe = form.paraModel(curso, esporte, campus, tecnico);
 
         equipe.setVitorias(0);
@@ -59,14 +63,14 @@ public class EquipeService {
         equipe.setPontos(0);
         equipeRepository.save(equipe);
 
-        List<ParticipacaoEquipe> participacoes = addUsuariosNaEquipe(equipe, form.getAtletasId());
+        List<ParticipacaoEquipe> participacoes = addUsuariosNaEquipe(equipe, form.getAtletasMatricula());
 
         return EquipeDTO.deModelPost(equipe, participacoes);
     }
 
     @Transactional
-    private List<ParticipacaoEquipe> addUsuariosNaEquipe(Equipe equipe, List<Integer> usuarioIds) {
-        List<Usuario> usuarios = usuarioRepository.findAllById(usuarioIds);
+    private List<ParticipacaoEquipe> addUsuariosNaEquipe(Equipe equipe, List<String> atletasMatricula) {
+        List<Usuario> usuarios = usuarioRepository.findAllByMatriculaIn(atletasMatricula);
 
         for (Usuario u : usuarios) {
           if (u.getCurso() != equipe.getCurso()) {
@@ -74,7 +78,7 @@ public class EquipeService {
           }
         }
 
-        if (usuarios.size() != usuarioIds.size()) {
+        if (usuarios.size() != atletasMatricula.size()) {
             throw new RuntimeException("Um ou mais usuários não foram encontrados");
         }
 
@@ -118,9 +122,11 @@ public class EquipeService {
     }
 
 
-    public List<EquipeDTO> findByEsporte(Integer esporteID) {
-        Esporte esporte = esporteRepository.findById(esporteID)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public List<EquipeDTO> findByEsporte(String nomeEsporte) {
+        Esporte esporte = esporteRepository.findByNome(nomeEsporte);
+        if(esporte==null) {
+            throw new RuntimeException("Esporte não encontrado.");
+        }
 
         List<Equipe> equipes = equipeRepository.findByEsporte(esporte);
         List<EquipeDTO> dtoList = new ArrayList<>();
@@ -143,34 +149,43 @@ public class EquipeService {
     }
 
     @Transactional
-    public EquipeDTO updateEquipe(Integer idEquipe, EquipeForm form) {
+    public EquipeDTO updateEquipe(String nomeEquipe, EquipeForm form) {
 
-        Equipe equipe = equipeRepository.findById(idEquipe)
-                .orElseThrow(() -> new RuntimeException("Equipe não encontrado."));
+        Equipe equipe = equipeRepository.findByNome(nomeEquipe);
+        if (equipe==null) {
+            throw new RuntimeException("Equipe não encontrada.");
+        }
 
-        if (form.getCursoId()!=null) {
-            Curso curso = cursoRepository.findById(form.getCursoId())
-                    .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
+        if (form.getCursoNome()!=null) {
+            Curso curso = cursoRepository.findByNome(form.getCursoNome());
+            if (curso==null) {
+                throw new RuntimeException("Curso não encontrado.");
+            }
             equipe.setCurso(curso);
         }
 
-        if (form.getEsporteId()!=null) {
-            Esporte esporte = esporteRepository.findById(form.getEsporteId())
-                    .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
-
-            if (form.getAtletasId().size() < esporte.getMinAtletas() || form.getAtletasId().size() > esporte.getMaxAtletas()) {
+        if (form.getEsporteNome()!=null) {
+            Esporte esporte = esporteRepository.findByNome(form.getEsporteNome());
+            if (esporte==null) {
+                throw new RuntimeException("Esporte não encontrado.");
+            }
+            if (form.getAtletasMatricula().size() < esporte.getMinAtletas() || form.getAtletasMatricula().size() > esporte.getMaxAtletas()) {
                 throw new RuntimeException("Tamanho inválido da equipe");
             }
             equipe.setEsporte(esporte);
         }
-        if (form.getCampusId()!=null) {
-            Campus campus = campusRepository.findById(form.getCampusId())
-                    .orElseThrow(() -> new RuntimeException("Campus não encontrado."));
+        if (form.getCampusNome()!=null) {
+            Campus campus = campusRepository.findByNome(form.getCampusNome());
+            if (campus==null) {
+                throw new RuntimeException("Campus não encontrado.");
+            }
             equipe.setCampus(campus);
         }
-        if (form.getTecnicoId()!=null) {
-            Usuario tecnico = usuarioRepository.findById(form.getTecnicoId())
-                    .orElseThrow(() -> new RuntimeException("Usuario não encontrado."));
+        if (form.getTecnicoMatricula()!=null) {
+            Usuario tecnico = usuarioRepository.findByMatricula(form.getTecnicoMatricula());
+            if (tecnico==null) {
+                throw new RuntimeException("Tecnico não encontrado.");
+            }
             equipe.setTecnico(tecnico);
         }
 
@@ -180,9 +195,9 @@ public class EquipeService {
 
         equipe.setNome(form.getNome());
 
-        if (form.getAtletasId()!=null)  {
+        if (form.getAtletasMatricula()!=null)  {
             participacaoEquipeRepository.deleteByEquipe(equipe);
-            List<ParticipacaoEquipe> participacoes = addUsuariosNaEquipe(equipe, form.getAtletasId());
+            List<ParticipacaoEquipe> participacoes = addUsuariosNaEquipe(equipe, form.getAtletasMatricula());
         }
 
         equipeRepository.save(equipe);
@@ -191,9 +206,11 @@ public class EquipeService {
     }
 
     @Transactional
-    public EquipeDTO deleteEquipe(Integer id) {
-        Equipe equipe = equipeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Equipe não encontrado."));
+    public EquipeDTO deleteEquipe(String nomeEquipe) {
+        Equipe equipe = equipeRepository.findByNome(nomeEquipe);
+        if (equipe==null) {
+            throw new RuntimeException("Equipe não encontrado.");
+        }
 
         equipeRepository.delete(equipe);
 

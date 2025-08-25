@@ -15,9 +15,9 @@ public class EliminatoriasController {
 
     private final EliminatoriasService eliminatoriasService;
 
-    @PostMapping("/gerar/{esporteId}")
-    public ResponseEntity<String> gerarEliminatorias(@PathVariable("esporteId") Integer esporteId) {
-        eliminatoriasService.gerarEliminatorias(esporteId);
+    @PostMapping("/gerar/{esporteNome}")
+    public ResponseEntity<String> gerarEliminatorias(@PathVariable("esporteNome") String esporteNome) {
+        eliminatoriasService.gerarEliminatorias(esporteNome);
         return ResponseEntity.status(201).body("Fase eliminatória gerada com sucesso.");
     }
 

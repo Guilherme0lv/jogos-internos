@@ -28,9 +28,11 @@ public class GrupoService {
     private final EsporteRepository esporteRepository;
 
     @Transactional
-    public void gerarGrupos(Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public List<GrupoDTO> gerarGrupos(String esporteNome) {
+        Esporte esporte = esporteRepository.findByNome(esporteNome);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
 
         List<Equipe> equipes = equipeRepository.findByEsporte(esporte);
         int total = equipes.size();
@@ -44,7 +46,8 @@ public class GrupoService {
 
         if (total <= 5) {
             Grupo grupo = new Grupo();
-        grupo.setNome(equipes.getFirst().getEsporte().getNome() + "-" + esporte.getEvento().getTipoEvento() + " Grupo " + 1);
+            grupo.setNome(equipes.getFirst().getEsporte().getNome() + "-" +
+                            esporte.getEvento().getTipoEvento() + " Grupo " + 1);
             grupo.setEsporte(esporte);
             grupo = grupoRepository.save(grupo);
             grupos.add(grupo);
@@ -53,7 +56,7 @@ public class GrupoService {
                 equipe.setGrupo(grupo);
                 equipeRepository.save(equipe);
             }
-            return;
+            return grupos.stream().map(GrupoDTO::deModel).toList();
         }
 
         int numGrupos = total / 3;
@@ -85,6 +88,7 @@ public class GrupoService {
                 equipeRepository.save(equipe);
             }
         }
+        return grupos.stream().map(GrupoDTO::deModel).toList();
     }
 
     public List<GrupoDTO> getGrupos() {
@@ -96,9 +100,11 @@ public class GrupoService {
         return dtoList;
     }
 
-    public List<ClassificacaoDTO> getClassificacao(Integer grupoId) {
-        Grupo grupo = grupoRepository.findById(grupoId)
-                .orElseThrow(() -> new RuntimeException("Grupo não encontrado."));
+    public List<ClassificacaoDTO> getClassificacao(String grupoNome) {
+        Grupo grupo = grupoRepository.findByNome(grupoNome);
+        if (grupo==null) {
+            throw new RuntimeException("Grupo não encontrado");
+        }
 
         List<Equipe> equipes = grupo.getEquipes();
 
@@ -107,9 +113,12 @@ public class GrupoService {
         return ClassificacaoDTO.mostrarClassificacao(equipes);
     }
 
-    public List<GrupoDTO> findByEsporte(Integer esporteId) {
-        Esporte esporte = esporteRepository.findById(esporteId)
-                .orElseThrow(() -> new RuntimeException("Esporte não encontrado."));
+    public List<GrupoDTO> findByEsporte(String nomeEsporte) {
+        Esporte esporte = esporteRepository.findByNome(nomeEsporte);
+
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
 
         List<Grupo> gruposList = grupoRepository.findByEsporte(esporte);
         List<GrupoDTO> dtoList = new ArrayList<>();
@@ -131,6 +140,15 @@ public class GrupoService {
         }
 
         grupoRepository.deleteAll(grupos);
+    }
+
+    @Transactional
+    public void deleteGrupoByEsporte(String nomeEsporte) {
+        Esporte esporte = esporteRepository.findByNome(nomeEsporte);
+        if (esporte==null) {
+            throw new RuntimeException("Esporte não encontrado");
+        }
+        grupoRepository.deleteGrupoByEsporte(esporte);
     }
 
     @Transactional

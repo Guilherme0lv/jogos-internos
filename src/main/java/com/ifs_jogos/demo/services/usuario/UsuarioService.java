@@ -25,9 +25,11 @@ public class UsuarioService {
 
     @Transactional
     public void registerUsuario(UsuarioForm form) {
-        Curso curso = cursoRepository.findById(form.getCursoId())
-                .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
+        Curso curso = cursoRepository.findByNome(form.getCursoNome());
 
+        if (curso==null) {
+            throw new RuntimeException("Curso não encontrado.");
+        }
         Usuario usuario = form.paraModel(curso);
 
         String senhaHash = PasswordUtils.encrypt(form.getSenha());
@@ -35,10 +37,13 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public boolean autenticar(LoginForm login) {
+    public UsuarioDTO autenticar(LoginForm login) {
         Usuario usuario = usuarioRepository.findByMatricula(login.getMatricula());
-
-        return usuario != null && PasswordUtils.compararSenha(login.getSenha(), usuario.getSenha());
+        if (usuario!=null && PasswordUtils.compararSenha(login.getSenha(), usuario.getSenha())) {
+            return UsuarioDTO.deModel(usuario);
+        } else {
+            return null;
+        }
     }
 
     public List<UsuarioDTO> getUsuarios() {
@@ -84,13 +89,18 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioDTO updateUsuario(Integer id, UsuarioForm atualizado) {
-        Usuario existente = usuarioRepository.findById(id)
-                .orElseThrow( () -> new RuntimeException("Usuario não encontrado."));
+    public UsuarioDTO updateUsuario(String matricula, UsuarioForm atualizado) {
+        Usuario existente = usuarioRepository.findByMatricula(matricula);
+        if (existente==null) {
+            throw new RuntimeException("Usuario não encontrado");
+        }
 
         if (atualizado.getMatricula() != null) existente.setMatricula(atualizado.getMatricula());
 
-        if (atualizado.getSenha() != null) existente.setSenha(atualizado.getSenha());
+        if (atualizado.getSenha() != null) {
+            String senhaHash = PasswordUtils.encrypt(atualizado.getSenha());
+            existente.setSenha(senhaHash);
+        }
 
         if (atualizado.getNomeCompleto() != null) existente.setNomeCompleto(atualizado.getNomeCompleto());
 
@@ -98,10 +108,11 @@ public class UsuarioService {
 
         if (atualizado.getTelefone() != null) existente.setTelefone(atualizado.getTelefone());
 
-        if (atualizado.getCursoId() != null) {
-            Curso curso = cursoRepository.findById(atualizado.getCursoId())
-                    .orElseThrow(() -> new RuntimeException("Curso não encontrado."));
-
+        if (atualizado.getCursoNome() != null) {
+            Curso curso = cursoRepository.findByNome(atualizado.getCursoNome());
+            if (curso==null) {
+                throw new RuntimeException("Curso não encontrado.");
+            }
             existente.setCurso(curso);
         }
 
@@ -109,9 +120,12 @@ public class UsuarioService {
     }
 
     @Transactional
-    public UsuarioDTO deleteUsuario(Integer id) {
-        Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow( () -> new RuntimeException("Usuario não encontrado."));
+    public UsuarioDTO deleteUsuario(String matricula) {
+        Usuario usuario = usuarioRepository.findByMatricula(matricula);
+
+        if (usuario==null) {
+            throw new RuntimeException("Usuario não encontrado.");
+        }
 
         usuarioRepository.delete(usuario);
         return UsuarioDTO.deModel(usuario);

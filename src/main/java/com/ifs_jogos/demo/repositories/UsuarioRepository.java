@@ -13,9 +13,10 @@ import java.util.List;
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
     Usuario findByMatricula(String matricula);
+    List<Usuario> findAllByMatriculaIn(List<String> matriculas);
     List<Usuario> findByNomeCompleto(String nome);
     List<Usuario> findByTipoUsuario(UsuarioEnum tipoUsuario);
 
-    boolean existsByTipoUsuarioAndCurso_Id(UsuarioEnum tipoUsuario, Integer cursoId);
+    boolean existsByTipoUsuarioAndCurso_Nome(UsuarioEnum tipoUsuario, String cursoNome);
 
 }
